@@ -1,0 +1,4 @@
+[core]
+    remote = credit_data_raw
+['remote "credit_data_raw"']
+    url = s3://jalg-data/data/kaagle_credit_risk/raw/
