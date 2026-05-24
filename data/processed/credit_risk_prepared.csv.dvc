@@ -1,0 +1,5 @@
+outs:
+- md5: 08bc7d7dbdc5357df612ed144c0f6875
+  size: 1572664
+  hash: md5
+  path: credit_risk_prepared.csv

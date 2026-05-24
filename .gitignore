@@ -190,3 +190,7 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 /model.pkl
+
+
+# Vscode setting
+.vscode/settings.json
