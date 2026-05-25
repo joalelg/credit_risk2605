@@ -139,6 +139,19 @@ save_model(best, '../models/model')
 
 ![Model comparaison](credit_risk2605_mod/images/model_comparaison.png "Model comparaison")
 
+El Modelo CatBoost resulta el que tiene mejor desempeño para todas las métricasm, que Pycaret presenta, así que es seleccionado como el modelo a utilizar para la previsión de no pago de nuestros potenciales clientes.  Pycaret permite también obterner muchas otras métricas como la curva ROC.
+
+![ROC Metric](credit_risk2605_mod/images/roc_auc_curve.png "ROC Metric")
+
+El modelo es exportado en models/model.pkl.
+Este objeto serializado contiene el pipeline que permite transormar nuevos datos y hacer predicciones, así que es posible cargarlo nuevamente, transformar data pasándola por el pipeline y finalmente hacer predicciones y obtener explicaciones con SHAP como las siguientes.
+
+![Shap overall](credit_risk2605_mod/images/shap_features_overall_importance.png "Shap overall")
+
+![Shap interactive](credit_risk2605_mod/images/shap_explain_interactive.png "Shap interactive")
+
+![Shap interactive](credit_risk2605_mod/images/shap_explain _case.png "Shap interactive")
+
 ##### Reproducibilidad
 
 [Descripción de los pasos o estrategias utilizadas para asegurar que el trabajo sea reproducible aquí.]
