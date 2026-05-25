@@ -40,7 +40,7 @@ En primera instancia se hizo una exporación de los datos, en el bloc de notas n
 Luego se hizo una exploración de la distribución de los datos:
 ![Num ftrs pairplot](credit_risk2605_mod/images/num_ftrs_pairplot.png "Num ftrs pairplot")
 
-Lo que destaca es que algunas características, como la tasa de interés y el porcentaje de ingreso (loan percent incom) parecen tener distribuciones distintas entre pagadores y no pagadores. 
+Lo que destaca es que algunas características, como la tasa de interés y el porcentaje de ingreso (loan percent incom) parecen tener distribuciones distintas entre pagadores y no pagadores así que podrían tener buena capacidad predictiva. 
 Por otraparte las variables edad, ingreso y tiempo en el empleo parecen tener valores atípicos. En el notebook se exploran esas características particulares y se encontró que dos de ellas, edad y tiempo en el empleo, tenían valores que atípicos que no hacían sentido, mientras que el ingreso, apesar de que hay algunos valures extremos podrían ser factibles así que esa data se deja.
 
 ### Preparación de los Datos
@@ -139,18 +139,34 @@ save_model(best, '../models/model')
 
 ![Model comparaison](credit_risk2605_mod/images/model_comparaison.png "Model comparaison")
 
-El Modelo CatBoost resulta el que tiene mejor desempeño para todas las métricasm, que Pycaret presenta, así que es seleccionado como el modelo a utilizar para la previsión de no pago de nuestros potenciales clientes.  Pycaret permite también obterner muchas otras métricas como la curva ROC.
+El Modelo CatBoost resulta el que tiene mejor desempeño para todas las métricasm, que Pycaret presenta, así que es seleccionado como el modelo a utilizar para la previsión de no pago de nuestros potenciales clientes.  Pycaret permite también obterner muchas otras métricas de los modelo, como la importancia de las variables, la curva ROC y otras de manera interactiva.
 
 ![ROC Metric](credit_risk2605_mod/images/roc_auc_curve.png "ROC Metric")
 
+Revisando las características más importantes vemos que se confirma la importancia del porcentaje de intreso y la tasa de interés, como dos de las variables más importantes para evaluar el riesgo de pago. Otras variables de importancia global son el ingreso de la persona, si ésta renta su vivienda y el grado como sujeto de préstamo D, que resulta ser malo. 
+![ROC Metric](credit_risk2605_mod/images/feature_importance.png "Feature Importance")
+
+
+
+
+##### Explicabilidad
 El modelo es exportado en models/model.pkl.
-Este objeto serializado contiene el pipeline que permite transormar nuevos datos y hacer predicciones, así que es posible cargarlo nuevamente, transformar data pasándola por el pipeline y finalmente hacer predicciones y obtener explicaciones con SHAP como las siguientes.
+Este objeto serializado contiene el pipeline que permite transormar nuevos datos y hacer predicciones, así que es posible cargarlo nuevamente, transformar data pasándola por el pipeline y finalmente hacer predicciones y obtener explicaciones con SHAP como las siguientes. 
+La primera gráfica, llamda Shap impact on model pone cada punto observado en color asociado con la variable objetivo, azul si para valores bajos y rojo para altos.  Esto  permite evaluar qué tanto influye cada variable en la variable de respuesta, notapos por ejemplo que la mayoría de datos con valor alto de ingreso están en azul, es decir menor riesgo.  Podemos analizar las demás variables de manera similar. 
 
 ![Shap overall](credit_risk2605_mod/images/shap_features_overall_importance.png "Shap overall")
 
+Es también posible explorar la importancia de las variables para casos particulares com lo muestra el siguiente gráfico. 
+![Shap interactive](credit_risk2605_mod/images/shap_explain_case.png "Shap interactive")
+
+O explorar, de manera interactiva, muchos gráficos como el anterior, dispuestos de manera vertical como se ve en el gráfico siguiente. 
 ![Shap interactive](credit_risk2605_mod/images/shap_explain_interactive.png "Shap interactive")
 
-![Shap interactive](credit_risk2605_mod/images/shap_explain _case.png "Shap interactive")
+
+
+
+
+
 
 ##### Reproducibilidad
 
