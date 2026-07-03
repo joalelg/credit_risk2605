@@ -8,10 +8,10 @@
 markdown
 # Introducción
 
-En este proyecto exploramos cómo modelar riesgo de crédito utilizando una librería para aprendizaje automático de Python, llamada Pycaret. El objetivo es saber cómo implementar el proyecto completo, desde la exploración, la preparación de datos, la modelació así como la interpretabilidad del resultado.
+En este proyecto exploramos cómo modelar riesgo de crédito utilizando una librería para aprendizaje automático de Python, llamada Pycaret. El objetivo es saber cómo implementar el proyecto completo, desde la exploración, la preparación de datos, la modelación así como la interpretabilidad del resultado.
 
 ## Exploración de Datos
-Los datos utizados son los datos de riesgo de crédito de préstamo  publicados en [Kaggle](https://www.kaggle.com/datasets/laotse/credit-risk-dataset/data), la cual contiene 32,581 registros con las siguientes columnas:
+Los datos utilizados son los datos de riesgo de crédito de préstamo  publicados en [Kaggle](https://www.kaggle.com/datasets/laotse/credit-risk-dataset/data), la cual contiene 32,581 registros con las siguientes columnas:
 
 bout Dataset
 
@@ -40,14 +40,17 @@ En primera instancia se hizo una exporación de los datos, en el bloc de notas n
 Luego se hizo una exploración de la distribución de los datos:
 ![Num ftrs pairplot](credit_risk2605_mod/images/num_ftrs_pairplot.png "Num ftrs pairplot")
 
-Lo que destaca es que algunas características, como la tasa de interés y el porcentaje de ingreso (loan percent incom) parecen tener distribuciones distintas entre pagadores y no pagadores así que podrían tener buena capacidad predictiva. 
-Por otraparte las variables edad, ingreso y tiempo en el empleo parecen tener valores atípicos. En el notebook se exploran esas características particulares y se encontró que dos de ellas, edad y tiempo en el empleo, tenían valores que atípicos que no hacían sentido, mientras que el ingreso, apesar de que hay algunos valures extremos podrían ser factibles así que esa data se deja.
+Lo que destaca es que algunas características, como la tasa de interés y el porcentaje de ingreso (loan percent incom), parecen tener distribuciones distintas entre pagadores y no pagadores así que podrían tener buena capacidad predictiva. 
+Por otraparte las variables edad, ingreso y tiempo en el empleo parecen tener valores atípicos. En el notebook se exploran esas características particulares y se encontró que dos de ellas, edad y tiempo en el empleo, tenían valores atípicos que no hacían sentido, mientras que el ingreso, apesar de que hay algunos valures extremos podrían ser factibles así que esa data se dejó sin cambios.
 
 ### Preparación de los Datos
 
-Una vez hecha la preparación de los datos, se crea el script src/prepare_data.py, que realizará el proceso, quitando tanto los valores nulos y atípicos. Estos bloques de código se añaden para crear el entorno necesario para tener el versionado de datos con DVC, lo que será explicado más adelante.
-Este código tiene como dependencia la data inicial data/raw/credit_risk_dataset.csv.
-La salida del mismo, es el archivo de datos con datos preparados para ser pasados los modelos a probar en la etapa de modelado y experimentación, ubicado en data/processed/credit_risk_prepared.csv.
+Una vez hecha la preparación de los datos, se crea el script src/prepare_data.py, que realizará el proceso, quitando tanto los valores nulos y atípicos. Estos bloques de código se añaden para crear el entorno necesario que permitirá el versionado de datos con DVC, lo que será explicado más adelante.
+Este código tiene como dependencia la data inicial  
+
+data/raw/credit_risk_dataset.csv.
+
+La salida del mismo, es el archivo de datos con registros preparados para ser pasados los modelos a probar en la etapa de modelado y experimentación, ubicado en data/processed/credit_risk_prepared.csv.
 
 
 Puedes usar simplemente:
@@ -102,7 +105,9 @@ data3.to_csv(out_data_rpath, index=False)
 
 #### Modelos y Experimentación
 
-En esta etapa partimos de la data preparada para realizar nuestros modelos y elegir el mejor de ellos. Es aquí donde se utiliza la librería de aprendizaje automático Pycaret. Se crea el script código de generación de modelos, incluido en el notebook notebooks/model.pynb. 
+En esta etapa partimos de la data preparada para realizar nuestros modelos y elegir el mejor de ellos. Es aquí donde se utiliza la librería de aprendizaje automático Pycaret. Se crea el script que contiene código de generación de modelos, extraído del bloc de notas 
+
+notebooks/model.pynb. 
 
 
 ```python 
@@ -139,32 +144,33 @@ save_model(best, '../models/model')
 
 ![Model comparaison](credit_risk2605_mod/images/model_comparaison.png "Model comparaison")
 
-El Modelo CatBoost resulta el que tiene mejor desempeño para todas las métricasm, que Pycaret presenta, así que es seleccionado como el modelo a utilizar para la previsión de no pago de nuestros potenciales clientes.  Pycaret permite también obterner muchas otras métricas de los modelo, como la importancia de las variables, la curva ROC y otras de manera interactiva.
+El Modelo CatBoost resulta el que tiene mejor desempeño para todas las métricas, que Pycaret presenta, así que es seleccionado como el modelo a utilizar para la previsión de no pago de nuestros potenciales clientes.  Pycaret permite también obterner muchas otras métricas de los modelos, como la importancia de las variables, la curva ROC y otras de manera interactiva.
 
 ![ROC Metric](credit_risk2605_mod/images/roc_auc_curve.png "ROC Metric")
 
-Revisando las características más importantes vemos que se confirma la importancia del porcentaje de intreso y la tasa de interés, como dos de las variables más importantes para evaluar el riesgo de pago. Otras variables de importancia global son el ingreso de la persona, si ésta renta su vivienda y el grado como sujeto de préstamo D, que resulta ser malo. 
+Revisando las características más importantes vemos que se confirma la importancia del porcentaje de ingreso y la tasa de interés, como dos de las variables más importantes para evaluar el riesgo de pago. Otras variables de importancia global son el ingreso de la persona, si ésta renta su vivienda y el grado como sujeto de préstamo D, que resulta ser un perfil malo. 
 ![ROC Metric](credit_risk2605_mod/images/feature_importance.png "Feature Importance")
 
 
 
 
 ##### Explicabilidad
+
 El modelo es exportado en models/model.pkl.
-Este objeto serializado contiene el pipeline que permite transormar nuevos datos y hacer predicciones, así que es posible cargarlo nuevamente, transformar data pasándola por el pipeline y finalmente hacer predicciones y obtener explicaciones con SHAP como las siguientes. 
-La primera gráfica, llamda Shap impact on model pone cada punto observado en color asociado con la variable objetivo, azul si para valores bajos y rojo para altos.  Esto  permite evaluar qué tanto influye cada variable en la variable de respuesta, notapos por ejemplo que la mayoría de datos con valor alto de ingreso están en azul, es decir menor riesgo.  Podemos analizar las demás variables de manera similar. 
+Este objeto serializado contiene el pipeline que permite transormar, ya sea los datos con los que se entrenó el modelo o nuevos datos, y hacer predicciones, y pasarlos a SHAP para entender cómo son asignadas dichas predicciones.  Para esto necesitamos  cargarlo el modelo nuevamente, transformar data pasándola por el pipeline y finalmente hacer predicciones y obtener explicaciones con SHAP como las siguientes.
+
+En primera instancia se muestra una gráfica hecha con los datos que fue entrenado el modelo, una vez pasado por el Pipeline y Shap para las interpretaciones.
+
+La primera gráfica, llamda Shap impact on model pone cada punto observado en color asociado con la variable objetivo, azul si para valores bajos y rojo para altos.  Esto  permite evaluar qué tanto influye cada variable en la variable de respuesta. Notamos, por ejemplo, que la mayoría de datos con valor alto de ingreso están asociados a riesgo bajo, en azul mientras salarios bajos se asocian a riesgo alto, en rojo. Inversamente, la tasa de interes alta, el tener casa rentada o grado D se asocian a mayor riesgo de impago para valores altos, 1 para las variables categórias, y menor para valores bajos.  Podemos analizar las demás variables de manera similar. 
 
 ![Shap overall](credit_risk2605_mod/images/shap_features_overall_importance.png "Shap overall")
 
-Es también posible explorar la importancia de las variables para casos particulares com lo muestra el siguiente gráfico. 
+Es también posible explorar cómo cada predicción particular para intentar entender cómo es que las variables  intervienen en el mecanismo de asignación del nivel de riesgo asignado como lo muestra el siguiente gráfico. 
+
 ![Shap interactive](credit_risk2605_mod/images/shap_explain_case.png "Shap interactive")
 
 O explorar, de manera interactiva, muchos gráficos como el anterior, dispuestos de manera vertical como se ve en el gráfico siguiente. 
 ![Shap interactive](credit_risk2605_mod/images/shap_explain_interactive.png "Shap interactive")
-
-
-
-
 
 
 
